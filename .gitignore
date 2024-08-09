@@ -1,0 +1,90 @@
+# General
+.DS_Store
+Thumbs.db
+*.log
+
+# Node.js / JavaScript
+node_modules/
+npm-debug.log
+yarn-error.log
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# NestJS
+dist/
+*.tsbuildinfo
+.idea/
+coverage/
+build/
+
+# React
+build/
+.cache/
+.eslintcache
+*.tsbuildinfo
+
+# MariaDB
+# Assuming you might have some dumps or temporary data
+*.sql
+*.dump
+
+# Redis
+# Ignore Redis persistent storage if used locally
+dump.rdb
+appendonly.aof
+
+# Docker
+docker-compose.override.yml
+# docker-compose.dev.yml
+.docker/
+
+# Ignore files related to debugging
+*.swp
+*.swo
+*.swn
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS Generated
+.DS_Store
+Thumbs.db
+
+# Ignore all files within these directories
+/ExcelUploads/*
+!/ExcelUploads/.gitkeep
+
+/ExcelPending/*
+!/ExcelPending/.gitkeep
+
+# Add any additional global ignores
+*.bak
+*.temp
+*.tmp
+*.swp
+*.swo
+*.swn
+
+# Ignore coverage reports
+coverage/
+
+# Ignore IDE specific folders
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.code-workspace
+
+# Ignore test output
+/test-output
+
+# Ignore build artifacts
+/build
+/target
+/out

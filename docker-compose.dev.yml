@@ -1,0 +1,39 @@
+version: "3.8"
+
+services:
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.dev
+    ports:
+      - "${APP_PORT}:8080"
+      - "9229:9229" # Debugger Port
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      DATABASE_HOST: ${DATABASE_HOST}
+      DATABASE_PORT: ${DATABASE_PORT}
+      DATABASE_USER: ${DATABASE_USER}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_NAME: ${DATABASE_NAME}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+    volumes:
+      - ./server:/app
+    command: npm run start:debug
+    depends_on:
+      - mariadb
+      - redis
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile.dev
+    ports:
+      - "${CLIENT_PORT}:3000"
+    environment:
+      NODE_ENV: development
+    volumes:
+      - ./client:/app
+    command: npm run dev
+    depends_on:
+      - server
