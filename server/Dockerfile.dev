@@ -6,11 +6,11 @@ COPY package.json package-lock.json ./
 
 RUN npm install
 
-COPY . .
-
 RUN npm install -g nodemon
 
-RUN mkdir -p /app/ExcelUploads /app/ExcelPending
+COPY . .
+
+# RUN mkdir -p -v ExcelUploads ExcelPending
 
 EXPOSE 8080 9229
 

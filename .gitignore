@@ -27,12 +27,9 @@ build/
 *.tsbuildinfo
 
 # MariaDB
-# Assuming you might have some dumps or temporary data
-*.sql
 *.dump
 
 # Redis
-# Ignore Redis persistent storage if used locally
 dump.rdb
 appendonly.aof
 

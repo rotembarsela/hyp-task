@@ -18,8 +18,9 @@ services:
       REDIS_HOST: ${REDIS_HOST}
       REDIS_PORT: ${REDIS_PORT}
     volumes:
-      - ./server:/app
-    command: npm run start:debug
+      - ./server/src:/app/src
+      - excel-uploads:/app/ExcelUploads
+      - excel-pending:/app/ExcelPending
     depends_on:
       - mariadb
       - redis
@@ -34,6 +35,9 @@ services:
       NODE_ENV: development
     volumes:
       - ./client:/app
-    command: npm run dev
     depends_on:
       - server
+
+volumes:
+  excel-uploads:
+  excel-pending:
