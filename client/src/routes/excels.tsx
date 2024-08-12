@@ -5,14 +5,18 @@ import { fetcher } from "../utils/fetcher";
 import UploadedFiles from "../components/excels/UploadedFiles";
 import PendingFiles from "../components/excels/PendingFiles";
 import { mocks } from "../mocks";
-import { Excel } from "../types";
+import { Excel, ExcelSpreadsheet } from "../types";
 import { utils } from "../utils/utils";
+import FileInfo from "../components/excels/FileInfo";
 
 function Excels() {
   const { user } = useAppContext();
 
-  const [uploadedFiles, setUploadedFiles] = useState<Excel[]>(mocks.excels);
+  const [uploadedFiles, setUploadedFiles] = useState<ExcelSpreadsheet[]>(
+    mocks.excelSpreadsheets
+  );
   const [pendingFiles, setPendingFiles] = useState<Excel[]>([]);
+  const [excelInfo, setExcelInfo] = useState<ExcelSpreadsheet | null>(null);
 
   const handleFilesSelected = (files: File[]) => {
     const newPendingFiles: Excel[] = files.map((file) => ({
@@ -36,7 +40,7 @@ function Excels() {
     });
 
     try {
-      const response = await fetcher<Excel[], FormData>(
+      const response = await fetcher<ExcelSpreadsheet[], FormData>(
         "https://test.com/api/excels",
         "POST",
         formData
@@ -49,14 +53,40 @@ function Excels() {
     }
   };
 
+  const handleExcelInfoClick = (id: string) => {
+    // TODO: Api Call
+    const findExcelFile = mocks.excelSpreadsheets.find((exc) => exc.id === id);
+    if (!findExcelFile) {
+      return;
+    }
+
+    setExcelInfo(findExcelFile);
+  };
+
+  const handleExcelInfoClose = () => {
+    setExcelInfo(null);
+  };
+
   return (
     <div className="h-full flex flex-col items-center gap-12">
       <h1 className="text-2xl">Hello, {user.name} 👋</h1>
-      <FileUpload onFilesSelected={handleFilesSelected} title="Upload Files" />
-      <div className="w-full h-[calc(100svh-264px)] flex items-start gap-7">
-        <UploadedFiles files={uploadedFiles} />
-        <PendingFiles files={pendingFiles} />
-      </div>
+      {excelInfo ? (
+        <FileInfo excel={excelInfo} onExcelInfoClose={handleExcelInfoClose} />
+      ) : (
+        <>
+          <FileUpload
+            onFilesSelected={handleFilesSelected}
+            title="Upload Files"
+          />
+          <div className="w-full h-[calc(100svh-264px)] flex items-start gap-7">
+            <UploadedFiles
+              files={uploadedFiles}
+              onExcelInfoClick={handleExcelInfoClick}
+            />
+            <PendingFiles files={pendingFiles} />
+          </div>
+        </>
+      )}
     </div>
   );
 }

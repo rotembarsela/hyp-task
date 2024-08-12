@@ -7,7 +7,6 @@ import ErrorPage from "./error-page";
 import Excels from "./routes/excels";
 import UserSelection from "./routes/user-selection";
 import ProtectedRoute from "./components/ProtectedRoute";
-import ExcelInfo from "./routes/excel-info";
 
 const router = createBrowserRouter([
   {
@@ -24,14 +23,6 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Excels />
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: "excels/:id",
-        element: (
-          <ProtectedRoute>
-            <ExcelInfo />
           </ProtectedRoute>
         ),
       },

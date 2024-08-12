@@ -1,3 +1,5 @@
+import { Excel } from "../types";
+
 const generateUUID = (): string => {
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
     const r = (Math.random() * 16) | 0;
@@ -6,6 +8,18 @@ const generateUUID = (): string => {
   });
 };
 
+const createMockExcelFile = (name: string, size: number): Excel => {
+  const file = new File(
+    [new Array(size).fill("\x00").join("")], // Mock content
+    `${name}.xlsx`,
+    {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    }
+  );
+  return { id: utils.generateUUID(), file };
+};
+
 export const utils = {
   generateUUID,
+  createMockExcelFile,
 };

@@ -9,7 +9,7 @@ function Paper(props: PaperProps) {
   const defaultClassNames = clsx(
     className,
     `
-        px-3 py-4 border border-gray-200 rounded-md shadow-sm
+        px-12 py-14 border border-gray-200 rounded-md shadow-sm
     `
   );
 
