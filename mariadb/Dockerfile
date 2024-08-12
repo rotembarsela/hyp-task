@@ -13,4 +13,4 @@ ENV MYSQL_PASSWORD=${MYSQL_PASSWORD}
 EXPOSE 3306
 
 COPY init.sql /docker-entrypoint-initdb.d/
-COPY init-db.sh /docker-entrypoint-initdb.d/
+# COPY init-db.sh /docker-entrypoint-initdb.d/

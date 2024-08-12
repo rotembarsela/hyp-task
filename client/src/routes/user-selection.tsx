@@ -1,9 +1,10 @@
 import { FormEvent } from "react";
 import { User } from "../types";
 import Select from "../components/ui/Select";
-import { users } from "../mocks";
 import { useNavigate } from "react-router-dom";
 import { useAppContext } from "../context/useAppProvider";
+import { mocks } from "../mocks";
+import Button from "../components/ui/Button";
 
 function UserSelection() {
   const { user, handleUserSelection } = useAppContext();
@@ -35,7 +36,7 @@ function UserSelection() {
     >
       <div className="w-[250px]">
         <Select
-          options={users}
+          options={mocks.users}
           value={user}
           onChange={handleChangeUser}
           renderOption={(option) => option.name}
@@ -43,9 +44,9 @@ function UserSelection() {
           labelValue="Select a user:"
         />
       </div>
-      <button className="px-3 py-2 text-lg bg-blue-500 text-white rounded-md">
+      <Button className="px-3 py-2 text-lg bg-blue-500 text-white rounded-md">
         Select
-      </button>
+      </Button>
     </form>
   );
 }

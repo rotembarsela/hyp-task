@@ -4,15 +4,23 @@ import { useAppContext } from "../context/useAppProvider";
 import { fetcher } from "../utils/fetcher";
 import UploadedFiles from "../components/excels/UploadedFiles";
 import PendingFiles from "../components/excels/PendingFiles";
+import { mocks } from "../mocks";
+import { Excel } from "../types";
+import { utils } from "../utils/utils";
 
 function Excels() {
   const { user } = useAppContext();
 
-  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
-  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+  const [uploadedFiles, setUploadedFiles] = useState<Excel[]>(mocks.excels);
+  const [pendingFiles, setPendingFiles] = useState<Excel[]>([]);
 
   const handleFilesSelected = (files: File[]) => {
-    setPendingFiles(files);
+    const newPendingFiles: Excel[] = files.map((file) => ({
+      id: utils.generateUUID(),
+      file,
+    }));
+
+    setPendingFiles(newPendingFiles);
     handleUpload(files);
   };
 
@@ -28,7 +36,7 @@ function Excels() {
     });
 
     try {
-      const response = await fetcher<File[], FormData>(
+      const response = await fetcher<Excel[], FormData>(
         "https://test.com/api/excels",
         "POST",
         formData

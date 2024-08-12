@@ -1,8 +1,9 @@
+import { Excel } from "../../types";
 import Paper from "../Paper";
 import FileList from "./FileList";
 
 type PendingFilesProps = {
-  files: File[];
+  files: Excel[];
 };
 
 function PendingFiles({ files }: PendingFilesProps) {

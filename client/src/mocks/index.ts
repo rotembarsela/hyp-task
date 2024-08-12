@@ -1,4 +1,5 @@
-import { User } from "../types";
+import { Excel, User } from "../types";
+import { utils } from "../utils/utils";
 
 const users: User[] = [
   {
@@ -21,4 +22,21 @@ const users: User[] = [
   },
 ];
 
-export { users };
+const createMockExcelFile = (name: string, size: number): Excel => {
+  const file = new File(
+    [new Array(size).fill("\x00").join("")], // Mock content
+    `${name}.xlsx`, // File name
+    {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    } // MIME type
+  );
+  return { id: utils.generateUUID(), file };
+};
+
+const excels: Excel[] = [
+  createMockExcelFile("Excel1", 1024),
+  createMockExcelFile("Excel2", 2048),
+  createMockExcelFile("Excel3", 3072),
+];
+
+export const mocks = { users, excels };
