@@ -3,11 +3,10 @@ import { User } from "../types";
 import Select from "../components/ui/Select";
 import { useNavigate } from "react-router-dom";
 import { useAppContext } from "../context/useAppProvider";
-import { mocks } from "../mocks";
 import Button from "../components/ui/Button";
 
 function UserSelection() {
-  const { user, handleUserSelection } = useAppContext();
+  const { users, selectedUser, handleUserSelection } = useAppContext();
 
   const navigate = useNavigate();
 
@@ -15,14 +14,12 @@ function UserSelection() {
     // API Call
     e.preventDefault();
 
-    if (user.email === "") {
+    if (selectedUser.token === "") {
       alert("Please select a valid user");
       return;
     }
 
     navigate("/excels");
-
-    console.log(user);
   };
 
   const handleChangeUser = (u: User) => {
@@ -36,8 +33,8 @@ function UserSelection() {
     >
       <div className="w-[250px]">
         <Select
-          options={mocks.users}
-          value={user}
+          options={users}
+          value={selectedUser}
           onChange={handleChangeUser}
           renderOption={(option) => option.name}
           getOptionValue={(option) => option.name}

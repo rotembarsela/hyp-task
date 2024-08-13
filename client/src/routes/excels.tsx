@@ -10,7 +10,7 @@ import { utils } from "../utils/utils";
 import FileInfo from "../components/excels/FileInfo";
 
 function Excels() {
-  const { user } = useAppContext();
+  const { selectedUser } = useAppContext();
 
   const [uploadedFiles, setUploadedFiles] = useState<ExcelSpreadsheet[]>(
     mocks.excelSpreadsheets
@@ -69,7 +69,7 @@ function Excels() {
 
   return (
     <div className="h-full flex flex-col items-center gap-12">
-      <h1 className="text-2xl">Hello, {user.name} 👋</h1>
+      <h1 className="text-2xl">Hello, {selectedUser.name} 👋</h1>
       {excelInfo ? (
         <FileInfo excel={excelInfo} onExcelInfoClose={handleExcelInfoClose} />
       ) : (

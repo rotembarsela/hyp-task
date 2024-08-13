@@ -1,10 +1,9 @@
 import { ReactNode } from "react";
 
 export type User = {
+  id: number;
+  token: string;
   name: string;
-  email: string;
-  israeliId: number;
-  phone: number;
 };
 
 export type Excel = {

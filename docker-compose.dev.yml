@@ -10,6 +10,7 @@ services:
       - "9229:9229" # Debugger Port
     environment:
       NODE_ENV: ${NODE_ENV}
+      APP_PORT: ${APP_PORT}
       DATABASE_HOST: ${DATABASE_HOST}
       DATABASE_PORT: ${DATABASE_PORT}
       DATABASE_USER: ${DATABASE_USER}
@@ -18,9 +19,9 @@ services:
       REDIS_HOST: ${REDIS_HOST}
       REDIS_PORT: ${REDIS_PORT}
     volumes:
-      - ./server/src:/app/src
-      - excel-uploads:/app/ExcelUploads
-      - excel-pending:/app/ExcelPending
+      - ./server:/app
+      - excel-uploads:/data/ExcelUploads
+      - excel-pending:/data/ExcelPending
     depends_on:
       - mariadb
       - redis

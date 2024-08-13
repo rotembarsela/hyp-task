@@ -2,7 +2,8 @@ import { createContext } from "react";
 import { User } from "../types";
 
 interface AppContextType {
-  user: User;
+  users: User[];
+  selectedUser: User;
   handleUserSelection: (u: User) => void;
 }
 

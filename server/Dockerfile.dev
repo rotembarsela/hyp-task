@@ -10,8 +10,6 @@ RUN npm install -g nodemon
 
 COPY . .
 
-# RUN mkdir -p -v ExcelUploads ExcelPending
-
 EXPOSE 8080 9229
 
-CMD ["nodemon", "--watch", "src", "--exec", "node", "--inspect=0.0.0.0:9229", "dist/main.js"]
+CMD ["npm", "run", "start:debug"]

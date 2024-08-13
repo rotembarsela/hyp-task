@@ -4,9 +4,9 @@ import { PropsWithChildren } from "react";
 
 type ProtectedRouteProps = PropsWithChildren;
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const { user } = useAppContext();
+  const { selectedUser } = useAppContext();
 
-  return user.email !== "" ? children : <Navigate to="/" />;
+  return selectedUser.token !== "" ? children : <Navigate to="/" />;
 };
 
 export default ProtectedRoute;
