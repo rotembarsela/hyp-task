@@ -1,6 +1,7 @@
-import { Excel, ExcelSpreadsheet, User } from "../types";
+import { Excel, ExcelSpreadsheet } from "../types";
 import { utils } from "../utils/utils";
 
+/*
 const users: User[] = [
   {
     name: "john",
@@ -21,6 +22,7 @@ const users: User[] = [
     phone: 21314124,
   },
 ];
+*/
 
 const excels: Excel[] = [
   utils.createMockExcelFile("Excel1", 1024),
@@ -76,4 +78,4 @@ const excelSpreadsheets: ExcelSpreadsheet[] = [
   },
 ];
 
-export const mocks = { users, excels, excelSpreadsheets };
+export const mocks = { excels, excelSpreadsheets };
