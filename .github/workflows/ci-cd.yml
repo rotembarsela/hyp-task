@@ -1,0 +1,91 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      mariadb:
+        image: mariadb:latest
+        env:
+          MYSQL_ROOT_PASSWORD: root_password
+          MYSQL_DATABASE: project_db
+          MYSQL_USER: project_user
+          MYSQL_PASSWORD: user_password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+      redis:
+        image: redis:latest
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Cache Server dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-server-${{ hashFiles('server/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-server-
+
+      - name: Install dependencies (Server)
+        working-directory: server
+        run: npm install
+
+      - name: Cache Client dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-client-${{ hashFiles('client/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-client-
+
+      - name: Install dependencies (Client)
+        working-directory: client
+        run: npm install
+
+      - name: Run tests (Server)
+        working-directory: server
+        run: npm run test
+
+      - name: Run tests (Client)
+        working-directory: client
+        run: npm test -- --ci --coverage
+
+      - name: Build Server
+        working-directory: server
+        run: npm run build
+
+      - name: Build Client
+        working-directory: client
+        run: npm run build
+
+      - name: Deploy (Production)
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: echo "Deployment steps here"

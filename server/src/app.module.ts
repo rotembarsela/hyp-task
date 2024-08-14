@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
+import { ExcelModule } from './excel/excel.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { UserModule } from './user/user.module';
       logging: true,
     }),
     UserModule,
+    ExcelModule,
   ],
   controllers: [AppController],
   providers: [AppService],
