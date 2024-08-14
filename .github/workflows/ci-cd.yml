@@ -20,6 +20,8 @@ jobs:
           MYSQL_DATABASE: project_db
           MYSQL_USER: project_user
           MYSQL_PASSWORD: user_password
+          MARIADB_INITDB_SKIP_TZINFO: 1
+          MARIADB_INNODB_USE_NATIVE_AIO: 0
         ports:
           - 3306:3306
         options: >-
@@ -27,7 +29,6 @@ jobs:
           --health-interval=10s
           --health-timeout=5s
           --health-retries=3
-        command: --innodb-use-native-aio=OFF
       redis:
         image: redis:latest
         ports:
@@ -45,7 +46,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 20
 
       - name: Cache Server dependencies
         uses: actions/cache@v3
