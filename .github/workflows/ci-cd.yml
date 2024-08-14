@@ -14,7 +14,7 @@ jobs:
 
     services:
       mariadb:
-        image: mariadb:latest
+        image: mariadb:10.6
         env:
           MYSQL_ROOT_PASSWORD: root_password
           MYSQL_DATABASE: project_db
@@ -27,6 +27,7 @@ jobs:
           --health-interval=10s
           --health-timeout=5s
           --health-retries=3
+        command: --innodb-use-native-aio=OFF
       redis:
         image: redis:latest
         ports:
@@ -69,6 +70,9 @@ jobs:
       - name: Install dependencies (Client)
         working-directory: client
         run: npm install
+
+      - name: Wait for MariaDB to be ready
+        run: sleep 15
 
       - name: Run tests (Server)
         working-directory: server
