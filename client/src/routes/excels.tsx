@@ -35,19 +35,22 @@ function Excels() {
     }
 
     const formData = new FormData();
-    files.forEach((file) => {
+    Array.from(files).forEach((file) => {
       formData.append("files", file);
     });
 
     try {
-      const response = await fetcher<ExcelSpreadsheet[], FormData>(
-        "https://test.com/api/excels",
+      const response = await fetcher<{ message: string }>(
+        `http://localhost:8080/api/v1/excels/upload/${selectedUser.id}`,
         "POST",
         formData
       );
 
+      await utils.sleep(2500);
+
       console.log("Upload successful:", response);
-      setUploadedFiles(response);
+      setPendingFiles([]);
+      setUploadedFiles([]);
     } catch (error) {
       console.error("Upload error:", (error as Error).message);
     }

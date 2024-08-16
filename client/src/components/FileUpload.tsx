@@ -10,6 +10,7 @@ const FileUpload = ({ onFilesSelected, title = "Upload" }: FileUploadProps) => {
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
+
     if (files) {
       const validTypes = [
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",

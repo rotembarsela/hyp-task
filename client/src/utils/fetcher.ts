@@ -1,14 +1,13 @@
-export async function fetcher<T, K>(
+export async function fetcher<T, K = undefined>(
   url: string,
   method: "GET" | "POST" | "PUT" | "DELETE",
-  body?: K
+  body?: K | FormData
 ): Promise<T> {
   const options: RequestInit = {
     method,
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: body ? JSON.stringify(body) : undefined,
+    headers:
+      body instanceof FormData ? {} : { "Content-Type": "application/json" },
+    body: body instanceof FormData ? body : JSON.stringify(body),
   };
 
   const response = await fetch(url, options);

@@ -19,7 +19,12 @@ const createMockExcelFile = (name: string, size: number): Excel => {
   return { id: utils.generateUUID(), file };
 };
 
+const sleep = async (ms: number) => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};
+
 export const utils = {
   generateUUID,
   createMockExcelFile,
+  sleep,
 };
