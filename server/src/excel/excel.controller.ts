@@ -14,12 +14,15 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 export class ExcelController {
   constructor(private readonly excelService: ExcelService) {}
 
-  @Get('list/:userId/:folder')
-  listFiles(
-    @Param('userId') userId: number,
-    @Param('folder') folder: string,
-  ): string[] {
-    return this.excelService.listFiles(userId, folder as 'uploads' | 'pending');
+  @Get('list/:userId')
+  async listFiles(@Param('userId') userId: number) {
+    const pendingFiles = await this.excelService.listFiles(userId, 'pending');
+    const uploadedFiles = await this.excelService.listFiles(userId, 'uploads');
+
+    return {
+      pendingFiles,
+      uploadedFiles,
+    };
   }
 
   @Get('read/:userId/:folder/:filename')
@@ -37,12 +40,10 @@ export class ExcelController {
     @Param('userId') userId: number,
     @UploadedFiles() files: Array<Express.Multer.File>,
   ) {
-    console.log('start');
     await this.excelService.uploadFiles(userId, files);
-    await this.excelService.processPendingFiles(userId);
 
-    const pendingFiles = this.excelService.listFiles(userId, 'pending');
-    const uploadedFiles = this.excelService.listFiles(userId, 'uploads');
+    const pendingFiles = await this.excelService.listFiles(userId, 'pending');
+    const uploadedFiles = await this.excelService.listFiles(userId, 'uploads');
 
     return {
       message: 'Files processed successfully',

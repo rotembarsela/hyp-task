@@ -1,4 +1,4 @@
-import { ExcelSpreadsheet } from "../../types";
+import { Excel } from "../../types";
 import { fetcher } from "../../utils/fetcher";
 import { utils } from "../../utils/utils";
 import Paper from "../Paper";
@@ -7,7 +7,7 @@ import HyperLink from "../ui/HyperLink";
 import UploadedFileList from "./UploadedFileList";
 
 type UploadedFiles = {
-  files: ExcelSpreadsheet[];
+  files: Excel[];
   onExcelInfoClick: (id: string) => void;
 };
 
@@ -24,9 +24,7 @@ function UploadedFiles({ files, onExcelInfoClick }: UploadedFiles) {
   const createDownloadLink = (id: string) => {
     console.log(id);
 
-    const downloadUrl = URL.createObjectURL(
-      utils.createMockExcelFile("Temp", 1024).file
-    );
+    const downloadUrl = utils.createMockExcelFile("Temp", 1024).name;
 
     console.log(downloadUrl);
 

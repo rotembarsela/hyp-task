@@ -8,7 +8,7 @@ export type User = {
 
 export type Excel = {
   id: string;
-  file: File;
+  name: string;
 };
 
 export type Variant = "info" | "success" | "danger" | "warning";
@@ -24,4 +24,15 @@ export type ExcelSpreadsheet = {
   name: string;
   headerRow: string[];
   bodyRows: ExcelRow[];
+};
+
+export type ExcelsUploadResponse = {
+  message: string;
+  pendingFiles: Excel[];
+  uploadedFiles: Excel[];
+};
+
+export type ExcelsListResponse = {
+  pendingFiles: Excel[];
+  uploadedFiles: Excel[];
 };

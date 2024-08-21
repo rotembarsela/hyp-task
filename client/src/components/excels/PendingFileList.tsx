@@ -9,11 +9,11 @@ type PendingFileListProps = {
 function PendingFileList({ files }: PendingFileListProps) {
   return (
     <ul className="flex flex-col gap-4">
-      {files.map(({ id, file }) => (
+      {files.map(({ id, name }) => (
         <ExcelCard key={id}>
           <div className="flex items-center gap-3">
             <ClockIcon width={40} height={40} />
-            <p className="text-lg">{file.name}</p>
+            <p className="text-lg">{name}</p>
           </div>
         </ExcelCard>
       ))}

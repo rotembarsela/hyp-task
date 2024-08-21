@@ -1,10 +1,17 @@
-import { Module } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { ExcelModule } from './excel/excel.module';
+import { ValidateUserMiddleware } from './validate-user.middleware';
+import { ExcelController } from './excel/excel.controller';
 
 @Module({
   imports: [
@@ -20,7 +27,7 @@ import { ExcelModule } from './excel/excel.module';
       database: process.env.DATABASE_NAME,
       entities: [__dirname + '/../**/*.entity{.ts,.js}'],
       synchronize: false,
-      logging: true,
+      logging: false,
     }),
     UserModule,
     ExcelModule,
@@ -28,4 +35,11 @@ import { ExcelModule } from './excel/excel.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(ValidateUserMiddleware)
+      .exclude({ path: 'users', method: RequestMethod.ALL })
+      .forRoutes(ExcelController);
+  }
+}

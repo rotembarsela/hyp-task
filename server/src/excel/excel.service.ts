@@ -59,44 +59,43 @@ export class ExcelService {
 
     for (const file of files) {
       const pendingFilePath = path.join(userPendingDir, file.originalname);
+
       await fsp.writeFile(pendingFilePath, file.buffer);
 
       this.pendingQueue.push(pendingFilePath);
-
-      const fileEntity = this.fileRepository.create({
-        f_name: file.originalname,
-        f_path: pendingFilePath,
-      });
-      await this.fileRepository.save(fileEntity);
     }
 
     await this.processPendingFiles(userId);
   }
 
   public async processPendingFiles(userId: number): Promise<void> {
-    await this.validateUser(userId);
-
     const { userUploadDir } = this.getUserDirectory(userId);
+    const invalidFiles: string[] = [];
 
     while (this.pendingQueue.length > 0) {
-      if (this.canProcessMoreFiles(userUploadDir)) {
-        const filePath = this.pendingQueue.shift();
-        if (await this.validateExcelFile(filePath)) {
-          await this.processFile(filePath, userUploadDir);
-        } else {
-          console.error(`File validation failed for ${filePath}`);
-          await fsp.unlink(filePath); // Remove invalid file
-        }
+      const filePath = this.pendingQueue.shift();
+
+      if (await this.validateExcelFile(filePath)) {
+        await this.processFile(filePath, userUploadDir);
       } else {
-        await this.sleep(1000);
+        console.error(`File validation failed for ${filePath}`);
+        invalidFiles.push(path.basename(filePath));
+        await fsp.unlink(filePath);
       }
+    }
+
+    if (invalidFiles.length > 0) {
+      // Handle invalid files, e.g., logging, notifying, or saving the list to a database.
+      console.log('Invalid files:', invalidFiles);
     }
   }
 
+  /* DONT USE
   private canProcessMoreFiles(userUploadDir: string): boolean {
     const filesInUploadDir = fs.readdirSync(userUploadDir);
     return filesInUploadDir.length < 5;
   }
+*/
 
   private async processFile(
     filePath: string,
@@ -105,15 +104,17 @@ export class ExcelService {
     const filename = path.basename(filePath);
     const targetPath = path.join(userUploadDir, filename);
 
+    console.log(userUploadDir);
+
     await this.moveFile(filePath, targetPath);
 
     const fileEntity = this.fileRepository.create({
       f_name: filename,
-      f_path: targetPath,
+      f_path: userUploadDir,
     });
-    const savedFile = await this.fileRepository.save(fileEntity);
+    await this.fileRepository.save(fileEntity);
 
-    await this.saveCustomerData(targetPath, savedFile.f_id);
+    await this.saveCustomerData(targetPath, fileEntity.f_id);
   }
 
   private async saveCustomerData(
@@ -153,7 +154,6 @@ export class ExcelService {
 
       const requiredColumns = ['Name', 'Email', 'Israeli ID', 'Phone'];
 
-      // Check if the required columns exist
       const firstRow = jsonData[0];
       for (const column of requiredColumns) {
         if (!firstRow.hasOwnProperty(column)) {
@@ -162,7 +162,6 @@ export class ExcelService {
         }
       }
 
-      // Validate each row
       for (const row of jsonData) {
         if (!row['Name'] || typeof row['Name'] !== 'string') {
           console.error(`Invalid or missing Name: ${JSON.stringify(row)}`);
@@ -196,15 +195,32 @@ export class ExcelService {
     return emailRegex.test(email);
   }
 
-  public listFiles(userId: number, folder: 'uploads' | 'pending'): string[] {
-    const { userUploadDir, userPendingDir } = this.getUserDirectory(userId);
-    const directoryPath = folder === 'uploads' ? userUploadDir : userPendingDir;
-    try {
-      return fs.readdirSync(directoryPath);
-    } catch (error) {
-      console.error(`Error reading directory ${directoryPath}:`, error);
-      throw error;
+  public async listFiles(
+    userId: number,
+    folder: 'uploads' | 'pending',
+  ): Promise<{ id: number; name: string }[]> {
+    await this.validateUser(userId);
+
+    const { userPendingDir, userUploadDir } = this.getUserDirectory(userId);
+
+    if (folder === 'pending') {
+      const pendingFiles = await fsp.readdir(userPendingDir);
+      return pendingFiles.map((filename) => ({
+        id: this.generateRandomId(),
+        name: filename,
+      }));
+    } else if (folder === 'uploads') {
+      const uploadedFiles = await this.fileRepository.find({
+        where: { f_path: userUploadDir },
+      });
+
+      return uploadedFiles.map((file) => ({
+        id: file.f_id,
+        name: file.f_name,
+      }));
     }
+
+    return [];
   }
 
   public readFile(
@@ -255,5 +271,9 @@ export class ExcelService {
 
   private sleep(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  private generateRandomId(): number {
+    return Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
   }
 }

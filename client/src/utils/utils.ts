@@ -16,7 +16,7 @@ const createMockExcelFile = (name: string, size: number): Excel => {
       type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     }
   );
-  return { id: utils.generateUUID(), file };
+  return { id: utils.generateUUID(), name: file.name };
 };
 
 const sleep = async (ms: number) => {

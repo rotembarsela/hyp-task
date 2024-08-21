@@ -9,6 +9,8 @@ export class ValidateUserMiddleware implements NestMiddleware {
   async use(req: Request, res: Response, next: NextFunction) {
     const userId = parseInt(req.params.userId, 10);
 
+    console.log(req.params);
+
     if (isNaN(userId)) {
       throw new NotFoundException('User ID is not valid');
     }

@@ -1,14 +1,16 @@
 import { DocumentIcon } from "@heroicons/react/24/outline";
 import { ReactNode } from "react";
-import { ExcelSpreadsheet } from "../../types";
+import { Excel } from "../../types";
 import ExcelCard from "./ExcelCard";
 
 type UploadedFileListProps = {
-  children?: (file: ExcelSpreadsheet) => ReactNode;
-  files: ExcelSpreadsheet[];
+  children?: (file: Excel) => ReactNode;
+  files: Excel[];
 };
 
 function UploadedFileList({ children, files }: UploadedFileListProps) {
+  console.log(files);
+
   return (
     <ul className="flex flex-col gap-4">
       {files.map((file) => (
