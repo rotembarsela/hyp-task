@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import FileUpload from "../components/FileUpload";
 import { useAppContext } from "../context/useAppProvider";
-import { fetcher } from "../utils/fetcher";
+import { APIFetcher } from "../utils/fetcher";
 import UploadedFiles from "../components/excels/UploadedFiles";
 import PendingFiles from "../components/excels/PendingFiles";
 import { mocks } from "../mocks";
@@ -43,8 +43,8 @@ function Excels() {
     });
 
     try {
-      const response = await fetcher<ExcelsUploadResponse>(
-        `http://localhost:8080/api/v1/excels/upload/${selectedUser.id}`,
+      const response = await APIFetcher<ExcelsUploadResponse>(
+        `/excels/upload/${selectedUser.id}`,
         "POST",
         formData
       );
@@ -73,11 +73,32 @@ function Excels() {
     setExcelInfo(null);
   };
 
+  const handleExcelDownloadClick = async (fileId: string, fileName: string) => {
+    try {
+      const response = await APIFetcher<Blob>(
+        `/excels/download/${selectedUser.id}/${fileId}`,
+        "GET"
+      );
+
+      const blob = response;
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.style.display = "none";
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Download error:", (error as Error).message);
+    }
+  };
+
   useEffect(() => {
     const getPendingUploadedFiles = async () => {
       try {
-        const response = await fetcher<ExcelsListResponse>(
-          `http://localhost:8080/api/v1/excels/list/${selectedUser.id}`,
+        const response = await APIFetcher<ExcelsListResponse>(
+          `/excels/list/${selectedUser.id}`,
           "GET"
         );
 
@@ -107,6 +128,7 @@ function Excels() {
             <UploadedFiles
               files={uploadedFiles}
               onExcelInfoClick={handleExcelInfoClick}
+              onExcelDownloadClick={handleExcelDownloadClick}
             />
             <PendingFiles files={pendingFiles} />
           </div>

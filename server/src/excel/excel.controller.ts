@@ -6,9 +6,12 @@ import {
   Post,
   UseInterceptors,
   UploadedFiles,
+  Res,
+  NotFoundException,
 } from '@nestjs/common';
 import { ExcelService } from './excel.service';
 import { FilesInterceptor } from '@nestjs/platform-express';
+import { Response } from 'express';
 
 @Controller('excels')
 export class ExcelController {
@@ -59,5 +62,34 @@ export class ExcelController {
     @Param('filename') filename: string,
   ): void {
     this.excelService.deleteFile(userId, folder, filename);
+  }
+
+  @Get('download/:userId/:fileId')
+  async downloadFile(
+    @Param('userId') userId: number,
+    @Param('fileId') fileId: number,
+    @Res() res: Response,
+  ) {
+    try {
+      const { filePath, fileName } = await this.excelService.getFileForDownload(
+        userId,
+        fileId,
+      );
+
+      console.log('before download');
+      console.log(filePath);
+      console.log(fileName);
+
+      res.download(filePath, fileName, (err) => {
+        if (err) {
+          console.error('Error downloading the file:', err);
+          throw new NotFoundException(
+            'Error occurred while downloading the file',
+          );
+        }
+      });
+    } catch (error) {
+      throw error;
+    }
   }
 }

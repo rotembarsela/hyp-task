@@ -11,7 +11,6 @@ function UserSelection() {
   const navigate = useNavigate();
 
   const handleFormSubmit = async (e: FormEvent) => {
-    // API Call
     e.preventDefault();
 
     if (selectedUser.token === "") {

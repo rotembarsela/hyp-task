@@ -1,4 +1,15 @@
-export async function fetcher<T, K = undefined>(
+const API_BASE_URL = "http://localhost:8080/api/v1";
+
+export async function APIFetcher<T, K = undefined>(
+  endpoint: string,
+  method: "GET" | "POST" | "PUT" | "DELETE",
+  body?: K | FormData
+): Promise<T> {
+  const url = `${API_BASE_URL}${endpoint}`;
+  return fetcher<T, K>(url, method, body);
+}
+
+async function fetcher<T, K = undefined>(
   url: string,
   method: "GET" | "POST" | "PUT" | "DELETE",
   body?: K | FormData
@@ -16,6 +27,22 @@ export async function fetcher<T, K = undefined>(
     throw new Error(`Error: ${response.statusText}`);
   }
 
-  const data: T = await response.json();
+  const contentType = response.headers.get("Content-Type");
+
+  let data: T;
+
+  if (contentType?.includes("application/json")) {
+    data = await response.json();
+  } else if (
+    contentType?.includes("application/octet-stream") ||
+    contentType?.includes(
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+  ) {
+    data = (await response.blob()) as unknown as T;
+  } else {
+    throw new Error(`Unsupported response type: ${contentType}`);
+  }
+
   return data;
 }

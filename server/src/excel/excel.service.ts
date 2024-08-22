@@ -117,6 +117,35 @@ export class ExcelService {
     await this.saveCustomerData(targetPath, fileEntity.f_id);
   }
 
+  public async getFileForDownload(
+    userId: number,
+    fileId: number,
+  ): Promise<{ filePath: string; fileName: string }> {
+    const file = await this.findFileById(fileId);
+
+    if (!file) {
+      throw new NotFoundException('File not found');
+    }
+
+    const { userUploadDir } = this.getUserDirectory(userId);
+
+    if (file.f_path !== userUploadDir) {
+      throw new NotFoundException("File not found in the user's directory");
+    }
+
+    const filePath = path.join(file.f_path, file.f_name);
+
+    if (!fs.existsSync(filePath)) {
+      throw new NotFoundException('File not found on the server');
+    }
+
+    return { filePath, fileName: file.f_name };
+  }
+
+  private async findFileById(fileId: number): Promise<FileEntity | null> {
+    return this.fileRepository.findOne({ where: { f_id: fileId } });
+  }
+
   private async saveCustomerData(
     filePath: string,
     fileId: number,
@@ -210,6 +239,7 @@ export class ExcelService {
         name: filename,
       }));
     } else if (folder === 'uploads') {
+      console.log(userUploadDir);
       const uploadedFiles = await this.fileRepository.find({
         where: { f_path: userUploadDir },
       });

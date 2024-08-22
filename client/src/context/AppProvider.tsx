@@ -1,7 +1,7 @@
 import { ReactNode, useEffect, useState } from "react";
 import { User } from "../types";
 import { AppContext } from "./AppContext";
-import { fetcher } from "../utils/fetcher";
+import { APIFetcher } from "../utils/fetcher";
 
 const initialUser: User = {
   id: 0,
@@ -19,8 +19,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     async function getUsers() {
-      const usersResponse = await fetcher<User[], undefined>(
-        `http://localhost:8080/api/v1/users`,
+      const usersResponse = await APIFetcher<User[], undefined>(
+        "/users",
         "GET"
       );
 
