@@ -24,13 +24,6 @@ export class ExcelService {
 
   private pendingQueue: string[] = [];
 
-  private async validateUser(userId: number): Promise<void> {
-    const user = await this.userService.findById(userId);
-    if (!user) {
-      throw new NotFoundException(`User with ID ${userId} not found`);
-    }
-  }
-
   private getUserDirectory(userId: number): {
     userUploadDir: string;
     userPendingDir: string;
@@ -53,11 +46,11 @@ export class ExcelService {
     userId: number,
     files: Express.Multer.File[],
   ): Promise<void> {
-    await this.validateUser(userId);
-
     const { userPendingDir } = this.getUserDirectory(userId);
 
     for (const file of files) {
+      console.log(file.originalname);
+
       const pendingFilePath = path.join(userPendingDir, file.originalname);
 
       await fsp.writeFile(pendingFilePath, file.buffer);
@@ -115,6 +108,45 @@ export class ExcelService {
     await this.fileRepository.save(fileEntity);
 
     await this.saveCustomerData(targetPath, fileEntity.f_id);
+  }
+
+  public async getCustomerData(
+    userId: number,
+    fileId: number,
+  ): Promise<{
+    fileId: number;
+    fileName: string;
+    columns: string[];
+    rows: any[];
+  }> {
+    // might be redundant
+    const file = await this.findFileById(fileId);
+
+    if (!file) {
+      throw new NotFoundException('File not found');
+    }
+
+    const { userUploadDir } = this.getUserDirectory(userId);
+    const filePath = path.join(userUploadDir, file.f_name);
+
+    // might be redundant
+    if (file.f_path !== userUploadDir || !fs.existsSync(filePath)) {
+      throw new NotFoundException("File not found in the user's directory");
+    }
+
+    const customers = await this.customerRepository.find({
+      where: { file: { f_id: fileId } },
+    });
+
+    const columns = ['Name', 'Email', 'Israeli ID', 'Phone'];
+    const rows = customers.map((customer) => ({
+      Name: customer.c_name,
+      Email: customer.c_email,
+      'Israeli ID': customer.c_israeli_id,
+      Phone: customer.c_phone,
+    }));
+
+    return { fileId: file.f_id, fileName: file.f_name, columns, rows };
   }
 
   public async getFileForDownload(
@@ -179,7 +211,7 @@ export class ExcelService {
     try {
       const workbook = readFile(filePath);
       const sheet = workbook.Sheets[workbook.SheetNames[0]];
-      const jsonData = utils.sheet_to_json(sheet);
+      const jsonData = utils.sheet_to_json(sheet, { raw: false });
 
       const requiredColumns = ['Name', 'Email', 'Israeli ID', 'Phone'];
 
@@ -228,8 +260,6 @@ export class ExcelService {
     userId: number,
     folder: 'uploads' | 'pending',
   ): Promise<{ id: number; name: string }[]> {
-    await this.validateUser(userId);
-
     const { userPendingDir, userUploadDir } = this.getUserDirectory(userId);
 
     if (folder === 'pending') {
@@ -253,14 +283,9 @@ export class ExcelService {
     return [];
   }
 
-  public readFile(
-    userId: number,
-    folder: 'uploads' | 'pending',
-    filename: string,
-  ): string {
-    const { userUploadDir, userPendingDir } = this.getUserDirectory(userId);
-    const directoryPath = folder === 'uploads' ? userUploadDir : userPendingDir;
-    const filePath = path.join(directoryPath, filename);
+  public readFile(userId: number, filename: string): string {
+    const { userUploadDir } = this.getUserDirectory(userId);
+    const filePath = path.join(userUploadDir, filename);
     try {
       return fs.readFileSync(filePath, 'utf-8');
     } catch (error) {
@@ -269,23 +294,33 @@ export class ExcelService {
     }
   }
 
-  public deleteFile(
-    userId: number,
-    folder: 'uploads' | 'pending',
-    filename: string,
-  ): void {
-    const { userUploadDir, userPendingDir } = this.getUserDirectory(userId);
-    const directoryPath = folder === 'uploads' ? userUploadDir : userPendingDir;
-    const filePath = path.join(directoryPath, filename);
+  public async deleteFile(userId: number, fileId: number): Promise<void> {
+    const file = await this.findFileById(fileId);
+
+    console.log('FileId:', fileId);
+
+    if (!file) {
+      throw new NotFoundException('File not found');
+    }
+
+    const { userUploadDir } = this.getUserDirectory(userId);
+
+    const filePath = path.join(userUploadDir, file.f_name);
+    if (file.f_path !== userUploadDir || !fs.existsSync(filePath)) {
+      throw new NotFoundException("File not found in the user's directory");
+    }
+
     try {
       fs.unlinkSync(filePath);
-      console.log(`Deleted file: ${filePath}`);
+      console.log(`Deleted file from filesystem: ${filePath}`);
     } catch (error) {
       console.error(`Error deleting file ${filePath}:`, error);
-      throw error;
+      throw new Error('Failed to delete the file from the server');
     }
-  }
 
+    await this.fileRepository.delete(fileId);
+    console.log(`Deleted file record from database: ${fileId}`);
+  }
   private async moveFile(source: string, destination: string): Promise<void> {
     try {
       await fsp.copyFile(source, destination);

@@ -10,22 +10,22 @@ const ExcelTable: React.FC<ExcelTableProps> = ({ excel }) => {
     <table className="min-w-full divide-y divide-gray-200">
       <thead className="bg-gray-50">
         <tr>
-          {excel.headerRow.map((header, index) => (
+          {excel.columns.map((col, index) => (
             <th
               key={index}
               className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
             >
-              {header}
+              {col}
             </th>
           ))}
         </tr>
       </thead>
       <tbody className="bg-white divide-y divide-gray-200">
-        {excel.bodyRows.map((row, index) => (
+        {excel.rows.map((row, index) => (
           <tr key={index} className="even:bg-gray-50">
-            {excel.headerRow.map((header) => (
-              <td key={header} className="px-6 py-4 whitespace-nowrap">
-                {row[header]}
+            {excel.columns.map((col) => (
+              <td key={col} className="px-6 py-4 whitespace-nowrap">
+                {row[col]}
               </td>
             ))}
           </tr>

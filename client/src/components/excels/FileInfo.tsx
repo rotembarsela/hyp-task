@@ -13,7 +13,7 @@ function FileInfo({ excel, onExcelInfoClose }: FileInfoProps) {
   return (
     <Paper className="w-full h-full flex flex-col gap-12">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold">{excel.name}</h2>
+        <h2 className="text-xl font-bold">{excel.fileName}</h2>
         <Button onClick={onExcelInfoClose}>Close</Button>
       </div>
       <Divider />

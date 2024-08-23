@@ -4,7 +4,6 @@ import { useAppContext } from "../context/useAppProvider";
 import { APIFetcher } from "../utils/fetcher";
 import UploadedFiles from "../components/excels/UploadedFiles";
 import PendingFiles from "../components/excels/PendingFiles";
-import { mocks } from "../mocks";
 import {
   Excel,
   ExcelsListResponse,
@@ -38,10 +37,16 @@ function Excels() {
     }
 
     const formData = new FormData();
-    Array.from(files).forEach((file) => {
-      formData.append("files", file);
+    files.forEach((file) => {
+      const cleanName = cleanFileName(file.name);
+      formData.append("files", new File([file], cleanName));
     });
 
+    // TODO: check if files length > 5, if so, sperate them into array of 5 files on each (cell) object in the array
+    // if there are 7 files for example, it will be [{file,file,file,file,file}, {file,file}] and get sent in chunks
+    // change to /excels/pending/${selectedUser.id}
+    // change to /excels/uploads/${selectedUser.id}
+    // on the server it will be /excels/:folderName/:userId
     try {
       const response = await APIFetcher<ExcelsUploadResponse>(
         `/excels/upload/${selectedUser.id}`,
@@ -59,14 +64,17 @@ function Excels() {
     }
   };
 
-  const handleExcelInfoClick = (id: string) => {
-    // TODO: Api Call
-    const findExcelFile = mocks.excelSpreadsheets.find((exc) => exc.id === id);
-    if (!findExcelFile) {
-      return;
-    }
+  const handleExcelInfoClick = async (fileId: string) => {
+    try {
+      const response = await APIFetcher<ExcelSpreadsheet>(
+        `/excels/${selectedUser.id}/uploads/${fileId}`,
+        "GET"
+      );
 
-    setExcelInfo(findExcelFile);
+      setExcelInfo(response);
+    } catch (error) {
+      console.error("Info error:", (error as Error).message);
+    }
   };
 
   const handleExcelInfoClose = () => {
@@ -92,6 +100,27 @@ function Excels() {
     } catch (error) {
       console.error("Download error:", (error as Error).message);
     }
+  };
+
+  const handleExcelRemoveClick = async (fileId: string) => {
+    try {
+      await APIFetcher<void>(
+        `/excels/delete/${selectedUser.id}/${fileId}`,
+        "DELETE"
+      );
+
+      const filteredIdFromUploadedFiles = uploadedFiles.filter(
+        (file) => file.id !== fileId
+      );
+
+      setUploadedFiles(filteredIdFromUploadedFiles);
+    } catch (error) {
+      console.error("Failed to delete the file:", (error as Error).message);
+    }
+  };
+
+  const cleanFileName = (fileName: string) => {
+    return fileName.replace(/[^\x20-\x7E]/g, "");
   };
 
   useEffect(() => {
@@ -129,6 +158,7 @@ function Excels() {
               files={uploadedFiles}
               onExcelInfoClick={handleExcelInfoClick}
               onExcelDownloadClick={handleExcelDownloadClick}
+              onExcelRemoveClick={handleExcelRemoveClick}
             />
             <PendingFiles files={pendingFiles} />
           </div>

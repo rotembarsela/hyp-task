@@ -1,5 +1,4 @@
 import { Excel } from "../../types";
-import { APIFetcher } from "../../utils/fetcher";
 import Paper from "../Paper";
 import Button from "../ui/Button";
 import UploadedFileList from "./UploadedFileList";
@@ -7,23 +6,16 @@ import UploadedFileList from "./UploadedFileList";
 type UploadedFiles = {
   files: Excel[];
   onExcelInfoClick: (id: string) => void;
-  onExcelDownloadClick: (fileId: string, fileName: string) => void;
+  onExcelDownloadClick: (fileId: string, fileName: string) => Promise<void>;
+  onExcelRemoveClick: (fileId: string) => Promise<void>;
 };
 
 function UploadedFiles({
   files,
   onExcelInfoClick,
   onExcelDownloadClick,
+  onExcelRemoveClick,
 }: UploadedFiles) {
-  const handleDeleteClick = async (id: string) => {
-    try {
-      await APIFetcher<void, undefined>(`/excels/${id}`, "DELETE");
-      alert("File deleted successfully");
-    } catch (error) {
-      console.error("Failed to delete file:", error);
-    }
-  };
-
   return (
     <Paper className="flex-1 h-full overflow-auto">
       <h2 className="text-lg font-bold mb-2">Uploaded Files</h2>
@@ -37,7 +29,7 @@ function UploadedFiles({
             >
               Download
             </Button>
-            <Button variant="danger" onClick={() => handleDeleteClick(id)}>
+            <Button variant="danger" onClick={() => onExcelRemoveClick(id)}>
               Remove
             </Button>
           </div>

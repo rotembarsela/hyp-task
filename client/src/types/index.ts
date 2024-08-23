@@ -20,10 +20,10 @@ export type ExcelRow = {
 };
 
 export type ExcelSpreadsheet = {
-  id: string;
-  name: string;
-  headerRow: string[];
-  bodyRows: ExcelRow[];
+  fileId: string;
+  fileName: string;
+  columns: string[];
+  rows: ExcelRow[];
 };
 
 export type ExcelsUploadResponse = {
