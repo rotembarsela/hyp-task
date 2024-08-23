@@ -32,10 +32,10 @@ const excels: Excel[] = [
 
 const excelSpreadsheets: ExcelSpreadsheet[] = [
   {
-    id: utils.generateUUID(),
-    name: "employee_records.xlsx",
-    headerRow: ["ID", "Name", "Position", "Department"],
-    bodyRows: [
+    fileId: utils.generateUUID(),
+    fileName: "employee_records.xlsx",
+    columns: ["ID", "Name", "Position", "Department"],
+    rows: [
       {
         ID: 1,
         Name: "Alice",
@@ -47,10 +47,10 @@ const excelSpreadsheets: ExcelSpreadsheet[] = [
     ],
   },
   {
-    id: utils.generateUUID(),
-    name: "product_inventory.xlsx",
-    headerRow: ["SKU", "Product Name", "Quantity", "Price"],
-    bodyRows: [
+    fileId: utils.generateUUID(),
+    fileName: "product_inventory.xlsx",
+    columns: ["SKU", "Product Name", "Quantity", "Price"],
+    rows: [
       {
         SKU: "A001",
         "Product Name": "Widget A",
@@ -67,10 +67,10 @@ const excelSpreadsheets: ExcelSpreadsheet[] = [
     ],
   },
   {
-    id: utils.generateUUID(),
-    name: "student_grades.xlsx",
-    headerRow: ["Student ID", "Name", "Course", "Grade"],
-    bodyRows: [
+    fileId: utils.generateUUID(),
+    fileName: "student_grades.xlsx",
+    columns: ["Student ID", "Name", "Course", "Grade"],
+    rows: [
       { "Student ID": 101, Name: "David", Course: "Math", Grade: "A" },
       { "Student ID": 102, Name: "Eva", Course: "Science", Grade: "B+" },
       { "Student ID": 103, Name: "Frank", Course: "History", Grade: "A-" },
