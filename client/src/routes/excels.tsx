@@ -12,9 +12,11 @@ import {
 } from "../types";
 import { utils } from "../utils/utils";
 import FileInfo from "../components/excels/FileInfo";
+import { useToast } from "../context/useToast";
 
 function Excels() {
   const { selectedUser } = useAppContext();
+  const { addToast } = useToast();
 
   const [uploadedFiles, setUploadedFiles] = useState<Excel[]>([]);
   const [pendingFiles, setPendingFiles] = useState<Excel[]>([]);
@@ -22,7 +24,7 @@ function Excels() {
 
   const handleFilesSelected = (files: File[]) => {
     const newPendingFiles: Excel[] = files.map((file) => ({
-      id: "",
+      id: String(Date.now() + Math.random()),
       name: file.name,
     }));
 
@@ -48,17 +50,22 @@ function Excels() {
     // change to /excels/uploads/${selectedUser.id}
     // on the server it will be /excels/:folderName/:userId
     try {
-      const response = await APIFetcher<ExcelsUploadResponse>(
-        `/excels/upload/${selectedUser.id}`,
-        "POST",
-        formData
-      );
+      const { message, pendingFiles, uploadedFiles, invalidFiles } =
+        await APIFetcher<ExcelsUploadResponse>(
+          `/excels/upload/${selectedUser.id}`,
+          "POST",
+          formData
+        );
 
       await utils.sleep(2500);
 
-      console.log("Upload successful:", response.message);
-      setPendingFiles(response.pendingFiles);
-      setUploadedFiles(response.uploadedFiles);
+      console.log("Upload successful:", message);
+      setPendingFiles(pendingFiles);
+      setUploadedFiles(uploadedFiles);
+
+      if (invalidFiles.length) {
+        addToast("Invalid files:", invalidFiles, "error");
+      }
     } catch (error) {
       console.error("Upload error:", (error as Error).message);
     }

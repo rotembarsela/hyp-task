@@ -45,7 +45,7 @@ export class ExcelService {
   public async uploadFiles(
     userId: number,
     files: Express.Multer.File[],
-  ): Promise<void> {
+  ): Promise<string[]> {
     const { userPendingDir } = this.getUserDirectory(userId);
 
     for (const file of files) {
@@ -58,10 +58,10 @@ export class ExcelService {
       this.pendingQueue.push(pendingFilePath);
     }
 
-    await this.processPendingFiles(userId);
+    return await this.processPendingFiles(userId);
   }
 
-  public async processPendingFiles(userId: number): Promise<void> {
+  public async processPendingFiles(userId: number): Promise<string[]> {
     const { userUploadDir } = this.getUserDirectory(userId);
     const invalidFiles: string[] = [];
 
@@ -81,6 +81,8 @@ export class ExcelService {
       // Handle invalid files, e.g., logging, notifying, or saving the list to a database.
       console.log('Invalid files:', invalidFiles);
     }
+
+    return invalidFiles;
   }
 
   /* DONT USE
@@ -240,6 +242,15 @@ export class ExcelService {
       const requiredColumns = ['Name', 'Email', 'Israeli ID', 'Phone'];
 
       const firstRow = jsonData[0];
+      const columnNames = Object.keys(firstRow);
+
+      for (const column of columnNames) {
+        if (!requiredColumns.includes(column)) {
+          console.error(`Unexpected column found: ${column}`);
+          return false;
+        }
+      }
+
       for (const column of requiredColumns) {
         if (!firstRow.hasOwnProperty(column)) {
           console.error(`Missing required column: ${column}`);

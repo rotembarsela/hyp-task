@@ -39,12 +39,12 @@ export class ExcelController {
 
   // TODO: change to /:folderName/:userId, POST
   @Post('upload/:userId')
-  @UseInterceptors(FilesInterceptor('files', 10))
+  @UseInterceptors(FilesInterceptor('files', 5))
   async uploadFiles(
     @Param('userId') userId: number,
     @UploadedFiles() files: Array<Express.Multer.File>,
   ) {
-    await this.excelService.uploadFiles(userId, files);
+    const invalidFiles = await this.excelService.uploadFiles(userId, files);
 
     const pendingFiles = await this.excelService.listFiles(userId, 'pending');
     const uploadedFiles = await this.excelService.listFiles(userId, 'uploads');
@@ -56,6 +56,7 @@ export class ExcelController {
       message: 'Files processed successfully',
       pendingFiles,
       uploadedFiles,
+      invalidFiles,
     };
   }
 

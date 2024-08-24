@@ -30,6 +30,7 @@ export type ExcelsUploadResponse = {
   message: string;
   pendingFiles: Excel[];
   uploadedFiles: Excel[];
+  invalidFiles: string[];
 };
 
 export type ExcelsListResponse = {
