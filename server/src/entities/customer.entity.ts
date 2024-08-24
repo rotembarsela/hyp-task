@@ -25,7 +25,7 @@ export class CustomerEntity {
   @Column()
   c_phone: string;
 
-  @ManyToOne(() => FileEntity, (file) => file.customers, {
+  @ManyToOne(() => FileEntity, (file) => file.f_customers, {
     onDelete: 'CASCADE',
     nullable: true,
   })

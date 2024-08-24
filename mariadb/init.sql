@@ -9,12 +9,20 @@ CREATE TABLE IF NOT EXISTS users
     u_name  VARCHAR(255) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS files
-(
-    f_id    INT AUTO_INCREMENT PRIMARY KEY,
-    f_name          VARCHAR(255) NOT NULL,               
-    f_path          VARCHAR(255) NOT NULL,                
-    f_upload_date   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE IF NOT EXISTS files (
+    f_id           INT AUTO_INCREMENT PRIMARY KEY,
+    f_name         VARCHAR(255) NOT NULL,
+    f_path         VARCHAR(255) NOT NULL,
+    f_upload_date  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    f_last_author    VARCHAR(255) NULL,
+    f_author         VARCHAR(255) NULL,
+    f_created_date   DATETIME NULL,
+    f_modified_date  DATETIME NULL,
+    f_application    VARCHAR(255) NULL,
+    f_app_version    VARCHAR(50) NULL,
+    f_doc_security   INT NULL DEFAULT 0,
+    f_scale_crop     BOOLEAN NULL DEFAULT FALSE,
+    f_worksheets     INT NULL
 );
 
 CREATE TABLE IF NOT EXISTS customers

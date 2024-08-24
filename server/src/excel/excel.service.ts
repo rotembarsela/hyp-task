@@ -97,14 +97,31 @@ export class ExcelService {
     const filename = path.basename(filePath);
     const targetPath = path.join(userUploadDir, filename);
 
-    console.log(userUploadDir);
-
     await this.moveFile(filePath, targetPath);
+
+    const workbook = readFile(targetPath);
+    const metadata = workbook.Props;
+    this.logProps(workbook.Props);
 
     const fileEntity = this.fileRepository.create({
       f_name: filename,
       f_path: userUploadDir,
+      f_last_author: metadata?.LastAuthor || '',
+      f_author: metadata?.Author || '',
+      f_created_date: metadata?.CreatedDate
+        ? new Date(metadata.CreatedDate)
+        : null,
+      f_modified_date: metadata?.ModifiedDate
+        ? new Date(metadata.ModifiedDate)
+        : null,
+      f_application: metadata?.Application || '',
+      f_app_version: metadata?.AppVersion || '',
+      f_doc_security:
+        typeof metadata?.DocSecurity === 'number' ? metadata.DocSecurity : 0,
+      f_scale_crop: metadata?.ScaleCrop || false,
+      f_worksheets: workbook.SheetNames.length,
     });
+
     await this.fileRepository.save(fileEntity);
 
     await this.saveCustomerData(targetPath, fileEntity.f_id);
@@ -183,6 +200,7 @@ export class ExcelService {
     fileId: number,
   ): Promise<void> {
     const workbook = readFile(filePath);
+    // this.logProps(workbook.Props);
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
     const rows = utils.sheet_to_json(sheet);
 
@@ -206,6 +224,12 @@ export class ExcelService {
       await this.customerRepository.save(customerEntity);
     }
   }
+
+  private logProps = (props: any) => {
+    for (const [key, value] of Object.entries(props)) {
+      console.log(`${key}: ${value}`);
+    }
+  };
 
   private async validateExcelFile(filePath: string): Promise<boolean> {
     try {
